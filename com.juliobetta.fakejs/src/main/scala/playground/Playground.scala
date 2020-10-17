@@ -1,6 +1,6 @@
 package playground
 
-import commands.Command
+import command.Command
 import app.State
 import files.{Directory, File}
 

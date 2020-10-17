@@ -1,4 +1,4 @@
-package commands
+package command
 import app.State
 
 object Invalid extends Command {

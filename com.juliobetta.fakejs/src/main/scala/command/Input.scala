@@ -1,6 +1,6 @@
-package commands
+package command
 
-import commands.actions.Cd
+import command.actions.Cd
 
 case class Input(input: String) {
   val tokens: Array[String] = input.split(" ")
