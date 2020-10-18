@@ -1,9 +1,9 @@
 package app
 
-import files.{Directory, FileEntry}
+import files.Directory
 
 
 case class State(
                   currentDirectory: Option[Directory] = None,
-                  data: List[FileEntry] = Nil
+                  source: Directory
                 )
