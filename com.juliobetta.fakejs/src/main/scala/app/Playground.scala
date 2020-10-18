@@ -1,7 +1,6 @@
-package playground
+package app
 
 import command.Command
-import app.State
 import files.{Directory, File}
 
 object Playground extends App {
@@ -17,9 +16,9 @@ object Playground extends App {
 
   val root = Directory("root", List(dir3, file4, file5))
 
-//  root.printFilesTree()
+  //  root.printFilesTree()
 
-  val state = State()
+  val state = State(None, root)
   val (newState, output) = Command.from("cd some/path")(state)
 
   output match {
@@ -27,4 +26,3 @@ object Playground extends App {
     case None => println("empty")
   }
 }
-
