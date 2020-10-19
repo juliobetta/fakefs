@@ -42,7 +42,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
         val updatedDir = Directory.removeEntry(dir, file1.name)
         val entryNames = updatedDir.contents.map(_.name)
 
-        entryNames must not contain (file1.name)
+        entryNames must not contain file1.name
         entryNames must contain (file2.name)
       }
 
@@ -51,7 +51,26 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
           val updatedDir = Directory.removeEntry(dir, "unknown")
           val entryNames = updatedDir.contents.map(_.name)
 
-          entryNames must contain (file1.name, file2.name)
+          entryNames must contain allOf (file1.name, file2.name)
+        }
+      }
+    }
+
+    describe("findByName()") {
+      val entries = List(file1, file2)
+      val dir = Directory.addEntries(entries)(Directory("dir01"))
+
+      it("finds entry by name") {
+        val found = Directory.findByName("my-file01", dir.contents)
+
+        found.map(_.name).head must equal(file1.name)
+      }
+
+      describe("when entry is not found") {
+        it("returns None") {
+          val unknown = Directory.findByName("unknown", dir.contents)
+
+          unknown must equal(None)
         }
       }
     }
@@ -70,10 +89,27 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
       val root = Directory.addEntries(List(dir3, file4, file5))(Directory.empty)
 
       it("finds an entry by its path") {
-        val found = Directory.findEntryByPath(root, "dir03/dir02/my-file03")
-        found.get must equal(file3)
+        val foundFile = Directory.findEntryByPath(root, "dir03/dir02/my-file03")
+        val foundDir = Directory.findEntryByPath(root, "dir03/dir02")
 
-        // cover other cases. e.g. .././dir01
+        foundFile.map(_.name).head must equal(file3.name)
+        foundDir.map(_.name).head must equal(dir2.name)
+      }
+
+      describe("when path is empty") {
+        it("returns the current dir") {
+          val entry = Directory.findEntryByPath(root, "")
+
+          entry must equal(Some(root))
+        }
+      }
+
+      describe("when file is in the middle of path") {
+        it("returns None") {
+          val entry = Directory.findEntryByPath(root, "my-file04/dir03")
+
+          entry must equal(None)
+        }
       }
     }
   }

@@ -48,18 +48,18 @@ object Directory {
     dir.copy(contents = dir.contents.filterNot(entry => entry.name == entryName))
   }
 
-  val findEntryByPath: (Directory, String) => Option[FileEntry] = (root, path) => {
-    val splitPath: List[String] = path.split(SEPARATOR).toList
-
-    @tailrec
-    def findByName(name: String, contents: List[FileEntry]): Option[FileEntry] = {
-      contents match {
-        case (_: File) :: tail if tail.nonEmpty => None // if file is in the middle of path, return NONE
-        case head :: _ if head.name == name => Some(head)
-        case _ :: tail => findByName(name, tail)
-        case _ => None
-      }
+  @tailrec
+  val findByName: (String, List[FileEntry]) => Option[FileEntry] = (name, contents) => {
+    contents match {
+//      case (_: File) :: tail if tail.nonEmpty => None // if file is in the middle of path, return NONE
+      case head :: _ if head.name == name => Some(head)
+      case _ :: tail => findByName(name, tail)
+      case _ => None
     }
+  }
+
+  val findEntryByPath: (Directory, String) => Option[FileEntry] = (root, path) => {
+    val splitPath: List[String] = path.split(SEPARATOR).toList.filter(_.nonEmpty)
 
     @tailrec
     def find(entries: List[String], acc: Directory): Option[FileEntry] = {
@@ -73,7 +73,8 @@ object Directory {
         case head :: tail => findByName(head, acc.contents) match {
           case Some(dir: Directory) if tail.isEmpty => Some(dir)
           case Some(dir: Directory) if tail.nonEmpty => find(tail, dir)
-          case Some(file: File) => Some(file)
+          case Some(file: File) if tail.isEmpty => Some(file)
+          case _ => None
         }
         case _ => None
       }
