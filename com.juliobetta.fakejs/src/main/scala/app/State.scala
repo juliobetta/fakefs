@@ -1,9 +1,9 @@
 package app
 
-import files.Directory
+import fs.Directory
 
 
 case class State(
-                  currentDirectory: Option[Directory] = None,
+                  currentDirectory: Directory,
                   source: Directory
                 )
