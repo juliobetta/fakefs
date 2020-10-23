@@ -34,13 +34,16 @@ object Directory {
   val addEntry: FileEntry => Directory => Directory = entry => dir => {
     if (someEntriesExist(List(entry), dir)) throw new RuntimeException(s"${entry.name} already exists")
 
-    val entryWithParent = entry match {
-      case file: File => file.copy(parent = Some(dir))
-      case directory: Directory => directory.copy(parent = Some(dir))
-      case _ => entry
-    }
+    val updatedContents = dir.contents :+ entry
 
-    dir.copy(contents = dir.contents :+ entryWithParent)
+    dir.copy(contents = updatedContents.map { entry =>
+      val updatedDir = Some(dir.copy(contents = updatedContents))
+
+      entry match {
+        case fileEntry: File => fileEntry.copy(parent = updatedDir)
+        case dirEntry: Directory => dirEntry.copy(parent = updatedDir)
+      }
+    })
   }
 
   val addEntrySafe: FileEntry => Directory => Try[Directory] = entry => dir => {
@@ -71,6 +74,7 @@ object Directory {
   @tailrec
   val findByName: (String, List[FileEntry]) => Option[FileEntry] = (name, contents) => {
     contents match {
+      case Nil => None
       case head :: _ if head.name == name => Some(head)
       case _ :: tail => findByName(name, tail)
       case _ => None
@@ -81,8 +85,8 @@ object Directory {
     val splitPath: List[String] = path.split(SEPARATOR).toList.filter(_.nonEmpty)
 
     @tailrec
-    def find(entries: List[String], acc: Directory): Option[FileEntry] = {
-      entries match {
+    def find(tokens: List[String], acc: Directory): Option[FileEntry] = {
+      tokens match {
         case Nil => Some(acc)
         case head :: tail if head == "." => find(tail, acc)
         case head :: tail if head == ".." => acc.parent match {
@@ -90,12 +94,10 @@ object Directory {
           case _ => None
         }
         case head :: tail => findByName(head, acc.contents) match {
-          case Some(dir: Directory) if tail.isEmpty => Some(dir)
+          case entry @ Some(_) if tail.isEmpty => entry
           case Some(dir: Directory) if tail.nonEmpty => find(tail, dir)
-          case Some(file: File) if tail.isEmpty => Some(file)
           case _ => None
         }
-        case _ => None
       }
     }
 

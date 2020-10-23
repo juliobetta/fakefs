@@ -92,8 +92,9 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
       val file4 = File("my-file04", None, Some("I have something 04"))
       val file5 = File("my-file05", None, Some("I have something 05"))
 
+      val dir0 = Directory("dir00")
       val dir1 = Directory.addEntries(List(file1, file2))(Directory("dir01"))
-      val dir2 = Directory.addEntry(file3)(Directory("dir02"))
+      val dir2 = Directory.addEntries(List(dir0, file3))(Directory("dir02"))
       val dir3 = Directory.addEntries(List(dir1, dir2))(Directory("dir03"))
 
       val root = Directory.addEntries(List(dir3, file4, file5))(Directory.empty)
@@ -104,6 +105,38 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
 
         foundFile.map(_.name).head must equal(file3.name)
         foundDir.map(_.name).head must equal(dir2.name)
+      }
+
+      describe("when single dot is present in the path") {
+        it("keeps the current directory") {
+          val foundFile = Directory.findEntryByPath(root, "dir03/./././dir02")
+
+          foundFile.map(_.name).head must equal(dir2.name)
+        }
+      }
+
+      describe("when double dots is present in the path") {
+        it("switches to the parent directory") {
+          val foundFile = Directory.findEntryByPath(root, "dir03/../my-file04")
+
+          foundFile.map(_.name).head must equal(file4.name)
+        }
+      }
+
+      describe("when double and single dots is present in the path") {
+        it("switches to the parent directory") {
+          val foundFile = Directory.findEntryByPath(root, "dir03/../my-file04")
+
+          foundFile.map(_.name).head must equal(file4.name)
+        }
+      }
+
+      describe("when entry is not found") {
+        it("returns empty") {
+          val foundFile = Directory.findEntryByPath(root, "dir03/../dir03/dir02/./dir00/../my-file03")
+
+          foundFile.map(_.name).head must equal(file3.name)
+        }
       }
 
       describe("when path is empty") {
