@@ -4,22 +4,10 @@ import scala.annotation.tailrec
 import scala.util.Try
 
 case class Directory(
-                      override val name: String,
-                      override val parent: Option[Directory] = None,
-                      contents: List[FileEntry] = Nil
-                    ) extends FileEntry(name, parent) {
-//  def printFilesTree(): Unit = {
-//    @tailrec
-//    def output(entries: List[FileEntry], acc: List[String]): List[String] =
-//      entries match {
-//        case Nil => acc
-//        case (dir: Directory) :: tail => output(dir.contents ++ tail, acc :+ s"${dir}")
-//        case head :: tail => output(tail, acc :+ s"${head}")
-//      }
-//
-//    output(contents, Nil).foreach { println }
-//  }
-}
+  override val name: String,
+  override val parent: Option[Directory] = None,
+  contents: List[FileEntry] = Nil
+) extends FileEntry(name, parent)
 
 object Directory {
   val ROOT_PATH: String = "/"
@@ -43,9 +31,7 @@ object Directory {
     dir.copy(contents = dir.contents :+ entryWithParent)
   }
 
-  val addEntrySafe: FileEntry => Directory => Try[Directory] = entry => dir => {
-    Try(addEntry(entry)(dir))
-  }
+  val addEntrySafe: FileEntry => Directory => Try[Directory] = entry => dir => Try(addEntry(entry)(dir))
 
   @tailrec
   val addEntries: List[FileEntry] => Directory => Directory = entries => dir => {
@@ -55,9 +41,7 @@ object Directory {
     }
   }
 
-  val addEntriesSafe: List[FileEntry] => Directory => Try[Directory] = entries => dir => {
-    Try(addEntries(entries)(dir))
-  }
+  val addEntriesSafe: List[FileEntry] => Directory => Try[Directory] = entries => dir => Try(addEntries(entries)(dir))
 
   val removeEntry: (Directory, String) => Directory = (dir, entryName) => {
     if (findByName(entryName, dir.contents).isEmpty) throw new RuntimeException(s"$entryName does not exist")
