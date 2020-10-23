@@ -7,6 +7,7 @@ import org.scalatest.matchers.must.Matchers
 class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
   val file1: File = File("my-file01", None, Some("I have something 01"))
   val file2: File = File("my-file02", None, Some("I have something 02"))
+  val file3: File = File("my-file03", None, Some("I have something 03"))
 
   describe("Directory") {
     describe("addEntry()") {
@@ -18,6 +19,12 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
 
       it("adds an entry at a time into a directory") {
         dir.contents.map(_.name) must contain allOf (file1.name, file2.name)
+      }
+
+      describe("when entry already exist in the directory") {
+        it("fails") {
+          Directory.addEntrySafe(file1)(dir).isFailure must equal(true)
+        }
       }
     }
 
@@ -31,6 +38,12 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
 
       it("adds multiple entries into a directory") {
         dir.contents.map(_.name) must contain allOf (file1.name, file2.name)
+      }
+
+      describe("when some entry already exist in the directory") {
+        it("fails") {
+          Directory.addEntriesSafe(List(file1, file3))(dir).isFailure must equal(true)
+        }
       }
     }
 
@@ -47,11 +60,8 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
       }
 
       describe("when entry is not found") {
-        it("returns the same directory contents") {
-          val updatedDir = Directory.removeEntry(dir, "unknown")
-          val entryNames = updatedDir.contents.map(_.name)
-
-          entryNames must contain allOf (file1.name, file2.name)
+        it("it fails") {
+          Directory.removeEntrySafe(dir, "unknown").isFailure must equal(true)
         }
       }
     }

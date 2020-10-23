@@ -1,6 +1,7 @@
 package fs
 
 import scala.annotation.tailrec
+import scala.util.Try
 
 case class Directory(
                       override val name: String,
@@ -26,7 +27,13 @@ object Directory {
 
   val empty: Directory = Directory("", None)
 
+  val someEntriesExist: (List[FileEntry], Directory) => Boolean = (entries, dir) => {
+    entries.map(entry => findByName(entry.name, dir.contents)).exists { _.isDefined }
+  }
+
   val addEntry: FileEntry => Directory => Directory = entry => dir => {
+    if (someEntriesExist(List(entry), dir)) throw new RuntimeException(s"${entry.name} already exists")
+
     val entryWithParent = entry match {
       case file: File => file.copy(parent = Some(dir))
       case directory: Directory => directory.copy(parent = Some(dir))
@@ -36,22 +43,34 @@ object Directory {
     dir.copy(contents = dir.contents :+ entryWithParent)
   }
 
+  val addEntrySafe: FileEntry => Directory => Try[Directory] = entry => dir => {
+    Try(addEntry(entry)(dir))
+  }
+
   @tailrec
   val addEntries: List[FileEntry] => Directory => Directory = entries => dir => {
     entries match {
       case head :: Nil => addEntry(head)(dir)
-      case head :: tail => addEntries(tail)(addEntry(head)(dir))
+      case head :: tail => addEntry(head)(addEntries(tail)(dir))
     }
   }
 
+  val addEntriesSafe: List[FileEntry] => Directory => Try[Directory] = entries => dir => {
+    Try(addEntries(entries)(dir))
+  }
+
   val removeEntry: (Directory, String) => Directory = (dir, entryName) => {
+    if (findByName(entryName, dir.contents).isEmpty) throw new RuntimeException(s"$entryName does not exist")
     dir.copy(contents = dir.contents.filterNot(entry => entry.name == entryName))
+  }
+
+  val removeEntrySafe: (Directory, String) => Try[Directory] = (dir, entryName) => {
+    Try(removeEntry(dir, entryName))
   }
 
   @tailrec
   val findByName: (String, List[FileEntry]) => Option[FileEntry] = (name, contents) => {
     contents match {
-//      case (_: File) :: tail if tail.nonEmpty => None // if file is in the middle of path, return NONE
       case head :: _ if head.name == name => Some(head)
       case _ :: tail => findByName(name, tail)
       case _ => None
