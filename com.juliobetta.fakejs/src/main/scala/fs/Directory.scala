@@ -67,23 +67,30 @@ object Directory {
   val findEntryByPath: (Directory, String) => Option[FileEntry] = (root, path) => {
     val splitPath: List[String] = path.split(SEPARATOR).toList.filter(_.nonEmpty)
 
-    @tailrec
-    val findEntry: (List[String], Directory) => Option[FileEntry] = (inputTokens, dir) => {
-      inputTokens match {
-        case Nil => Some(dir)
-        case head :: tail if head == "." => findEntry(tail, dir)
-        case head :: tail if head == ".." => dir.parent match {
-          case Some(parentDir) => findEntry(tail, parentDir)
-          case _ => None
-        }
-        case head :: tail => findByName(head, dir.contents) match {
-          case entry @ Some(_) if tail.isEmpty => entry
-          case Some(dir: Directory) if tail.nonEmpty => findEntry(tail, dir)
-          case _ => None
+    /**
+     * Helper is necessary to give `findEntry` a context to call itself recursively. otherwise, it throws the following:
+     * "scala forward reference extends over definition of value"
+     * the alternative is declaring `findEntry` as a `def`. but I kinda like using `val` =)
+     */
+    object Helper {
+      @tailrec
+      val findEntry: (List[String], Directory) => Option[FileEntry] = (inputTokens, dir) => {
+        inputTokens match {
+          case Nil => Some(dir)
+          case head :: tail if head == "." => findEntry(tail, dir)
+          case head :: tail if head == ".." => dir.parent match {
+            case Some(parentDir) => findEntry(tail, parentDir)
+            case _ => None
+          }
+          case head :: tail => findByName(head, dir.contents) match {
+            case entry@Some(_) if tail.isEmpty => entry
+            case Some(dir: Directory) if tail.nonEmpty => findEntry(tail, dir)
+            case _ => None
+          }
         }
       }
     }
 
-    findEntry(splitPath, root)
+    Helper.findEntry(splitPath, root)
   }
 }

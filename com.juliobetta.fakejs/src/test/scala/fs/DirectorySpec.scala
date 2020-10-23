@@ -8,13 +8,15 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
   val file1: File = File("my-file01", None, Some("I have something 01"))
   val file2: File = File("my-file02", None, Some("I have something 02"))
   val file3: File = File("my-file03", None, Some("I have something 03"))
+  val file4: File = File("my-file04", None, Some("I have something 04"))
+  val file5: File = File("my-file05", None, Some("I have something 05"))
 
   describe("Directory") {
     describe("addEntry()") {
       val dir = (Directory.addEntry(file1) andThen Directory.addEntry(file2))(Directory("dir01"))
 
       it("sets parent directory to entries") {
-        dir.contents.map(_.parent.get.name).distinct must equal(List(dir.name))
+        dir.contents.map(_.parent.get.name).distinct mustEqual List(dir.name)
       }
 
       it("adds an entry at a time into a directory") {
@@ -24,7 +26,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
 
       describe("when entry already exist in the directory") {
         it("fails") {
-          Directory.addEntrySafe(file1)(dir).isFailure must equal(true)
+          Directory.addEntrySafe(file1)(dir).isFailure mustBe true
         }
       }
     }
@@ -34,7 +36,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
       val dir = Directory.addEntries(entries)(Directory("dir01"))
 
       it("sets parent directory to entries") {
-        dir.contents.map(_.parent.get.name).distinct must equal(List(dir.name))
+        dir.contents.map(_.parent.get.name).distinct mustEqual List(dir.name)
       }
 
       it("adds multiple entries into a directory") {
@@ -44,7 +46,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
 
       describe("when some entry already exist in the directory") {
         it("fails") {
-          Directory.addEntriesSafe(List(file1, file3))(dir).isFailure must equal(true)
+          Directory.addEntriesSafe(List(file1, file3))(dir).isFailure mustBe true
         }
       }
     }
@@ -63,7 +65,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
 
       describe("when entry is not found") {
         it("it fails") {
-          Directory.removeEntrySafe(dir, "unknown").isFailure must equal(true)
+          Directory.removeEntrySafe(dir, "unknown").isFailure mustBe true
         }
       }
     }
@@ -75,25 +77,19 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
       it("finds entry by name") {
         val found = Directory.findByName("my-file01", dir.contents)
 
-        found.map(_.name).head must equal(file1.name)
+        found.map(_.name).head mustEqual file1.name
       }
 
       describe("when entry is not found") {
         it("returns None") {
           val unknown = Directory.findByName("unknown", dir.contents)
 
-          unknown must equal(None)
+          unknown mustBe None
         }
       }
     }
 
     describe("findEntryByPath()") {
-      val file1 = File("my-file01", None, Some("I have something 01"))
-      val file2 = File("my-file02", None, Some("I have something 02"))
-      val file3 = File("my-file03", None, Some("I have something 03"))
-      val file4 = File("my-file04", None, Some("I have something 04"))
-      val file5 = File("my-file05", None, Some("I have something 05"))
-
       val dir0 = Directory("dir00")
       val dir1 = Directory.addEntries(List(file1, file2))(Directory("dir01"))
       val dir2 = Directory.addEntries(List(dir0, file3))(Directory("dir02"))
@@ -105,15 +101,15 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
         val foundFile = Directory.findEntryByPath(root, "dir03/dir02/my-file03")
         val foundDir = Directory.findEntryByPath(root, "dir03/dir02")
 
-        foundFile.map(_.name).head must equal(file3.name)
-        foundDir.map(_.name).head must equal(dir2.name)
+        foundFile.map(_.name).head mustEqual file3.name
+        foundDir.map(_.name).head mustEqual dir2.name
       }
 
       describe("when single dot is present in the path") {
         it("keeps the current directory") {
           val foundFile = Directory.findEntryByPath(root, "dir03/./././dir02")
 
-          foundFile.map(_.name).head must equal(dir2.name)
+          foundFile.map(_.name).head mustEqual dir2.name
         }
       }
 
@@ -121,7 +117,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
         it("switches to the parent directory") {
           val foundFile = Directory.findEntryByPath(root, "dir03/../my-file04")
 
-          foundFile.map(_.name).head must equal(file4.name)
+          foundFile.map(_.name).head mustEqual file4.name
         }
       }
 
@@ -129,7 +125,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
         it("switches to the parent directory") {
           val foundFile = Directory.findEntryByPath(root, "dir03/../my-file04")
 
-          foundFile.map(_.name).head must equal(file4.name)
+          foundFile.map(_.name).head mustEqual file4.name
         }
       }
 
@@ -137,7 +133,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
         it("returns empty") {
           val foundFile = Directory.findEntryByPath(root, "dir03/../dir03/dir02/./dir00/../my-file03")
 
-          foundFile.map(_.name).head must equal(file3.name)
+          foundFile.map(_.name).head mustEqual file3.name
         }
       }
 
@@ -145,7 +141,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
         it("returns the current dir") {
           val entry = Directory.findEntryByPath(root, "")
 
-          entry must equal(Some(root))
+          entry mustBe Some(root)
         }
       }
 
@@ -153,7 +149,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
         it("returns None") {
           val entry = Directory.findEntryByPath(root, "my-file04/dir03")
 
-          entry must equal(None)
+          entry mustBe None
         }
       }
     }
