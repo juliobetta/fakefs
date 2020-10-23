@@ -18,7 +18,8 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
       }
 
       it("adds an entry at a time into a directory") {
-        dir.contents.map(_.name) must contain allOf (file1.name, file2.name)
+        val expected = List(file1.name, file2.name)
+        dir.contents.map(_.name) must contain theSameElementsAs expected
       }
 
       describe("when entry already exist in the directory") {
@@ -37,7 +38,8 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
       }
 
       it("adds multiple entries into a directory") {
-        dir.contents.map(_.name) must contain allOf (file1.name, file2.name)
+        val expected = List(file1.name, file2.name)
+        dir.contents.map(_.name) must contain theSameElementsAs expected
       }
 
       describe("when some entry already exist in the directory") {

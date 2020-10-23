@@ -55,6 +55,7 @@ object Directory {
     entries match {
       case head :: Nil => addEntry(head)(dir)
       case head :: tail => addEntry(head)(addEntries(tail)(dir))
+      case _ => dir
     }
   }
 
