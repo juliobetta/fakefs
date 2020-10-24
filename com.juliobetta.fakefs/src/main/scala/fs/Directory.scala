@@ -6,7 +6,7 @@ import scala.util.Try
 case class Directory(
   override val name: String,
   override val parent: Option[Directory] = None,
-  contents: List[FileEntry] = Nil
+  contents: Vector[FileEntry] = Vector()
 ) extends FileEntry(name, parent)
 
 object Directory {
@@ -15,12 +15,12 @@ object Directory {
 
   val empty: Directory = Directory("", None)
 
-  val someEntriesExist: (List[FileEntry], Directory) => Boolean = (entries, dir) => {
+  val someEntriesExist: (Vector[FileEntry], Directory) => Boolean = (entries, dir) => {
     entries.map(entry => findByName(entry.name, dir.contents)).exists { _.isDefined }
   }
 
   val addEntry: FileEntry => Directory => Directory = entry => dir => {
-    if (someEntriesExist(List(entry), dir)) throw new RuntimeException(s"${entry.name} already exists")
+    if (someEntriesExist(Vector(entry), dir)) throw new RuntimeException(s"${entry.name} already exists")
 
     val updatedContents = dir.contents :+ entry
 
@@ -37,15 +37,15 @@ object Directory {
   val addEntrySafe: FileEntry => Directory => Try[Directory] = entry => dir => Try(addEntry(entry)(dir))
 
   @tailrec
-  val addEntries: List[FileEntry] => Directory => Directory = entries => dir => {
+  val addEntries: Vector[FileEntry] => Directory => Directory = entries => dir => {
     entries match {
-      case head :: Nil => addEntry(head)(dir)
-      case head :: tail => addEntry(head)(addEntries(tail)(dir))
+      case head +: Vector() => addEntry(head)(dir)
+      case head +: tail => addEntry(head)(addEntries(tail)(dir))
       case _ => dir
     }
   }
 
-  val addEntriesSafe: List[FileEntry] => Directory => Try[Directory] = entries => dir => Try(addEntries(entries)(dir))
+  val addEntriesSafe: Vector[FileEntry] => Directory => Try[Directory] = entries => dir => Try(addEntries(entries)(dir))
 
   val removeEntry: (Directory, String) => Directory = (dir, entryName) => {
     if (findByName(entryName, dir.contents).isEmpty) throw new RuntimeException(s"$entryName does not exist")
@@ -55,17 +55,17 @@ object Directory {
   val removeEntrySafe: (Directory, String) => Try[Directory] = (dir, entryName) => Try(removeEntry(dir, entryName))
 
   @tailrec
-  val findByName: (String, List[FileEntry]) => Option[FileEntry] = (name, contents) => {
+  val findByName: (String, Vector[FileEntry]) => Option[FileEntry] = (name, contents) => {
     contents match {
-      case Nil => None
-      case head :: _ if head.name == name => Some(head)
-      case _ :: tail => findByName(name, tail)
+      case Vector() => None
+      case head +: _ if head.name == name => Some(head)
+      case _ +: tail => findByName(name, tail)
       case _ => None
     }
   }
 
   val findEntryByPath: (Directory, String) => Option[FileEntry] = (root, path) => {
-    val splitPath: List[String] = path.split(SEPARATOR).toList.filter(_.nonEmpty)
+    val splitPath: Vector[String] = path.split(SEPARATOR).toVector.filter(_.nonEmpty)
 
     /**
      * Helper is necessary to give `findEntry` a context to call itself recursively. otherwise, it throws the following:
@@ -74,15 +74,15 @@ object Directory {
      */
     object Helper {
       @tailrec
-      val findEntry: (List[String], Directory) => Option[FileEntry] = (inputTokens, dir) => {
+      val findEntry: (Vector[String], Directory) => Option[FileEntry] = (inputTokens, dir) => {
         inputTokens match {
-          case Nil => Some(dir)
-          case head :: tail if head == "." => findEntry(tail, dir)
-          case head :: tail if head == ".." => dir.parent match {
+          case Vector() => Some(dir)
+          case head +: tail if head == "." => findEntry(tail, dir)
+          case head +: tail if head == ".." => dir.parent match {
             case Some(parentDir) => findEntry(tail, parentDir)
             case _ => None
           }
-          case head :: tail => findByName(head, dir.contents) match {
+          case head +: tail => findByName(head, dir.contents) match {
             case entry@Some(_) if tail.isEmpty => entry
             case Some(dir: Directory) if tail.nonEmpty => findEntry(tail, dir)
             case _ => None

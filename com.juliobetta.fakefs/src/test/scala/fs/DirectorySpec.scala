@@ -16,11 +16,11 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
       val dir = (Directory.addEntry(file1) andThen Directory.addEntry(file2))(Directory("dir01"))
 
       it("sets parent directory to entries") {
-        dir.contents.map(_.parent.get.name).distinct mustEqual List(dir.name)
+        dir.contents.map(_.parent.get.name).distinct mustEqual Vector(dir.name)
       }
 
       it("adds an entry at a time into a directory") {
-        val expected = List(file1.name, file2.name)
+        val expected = Vector(file1.name, file2.name)
         dir.contents.map(_.name) must contain theSameElementsAs expected
       }
 
@@ -32,27 +32,27 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
     }
 
     describe("addEntries()") {
-      val entries = List(file1, file2)
+      val entries = Vector(file1, file2)
       val dir = Directory.addEntries(entries)(Directory("dir01"))
 
       it("sets parent directory to entries") {
-        dir.contents.map(_.parent.get.name).distinct mustEqual List(dir.name)
+        dir.contents.map(_.parent.get.name).distinct mustEqual Vector(dir.name)
       }
 
       it("adds multiple entries into a directory") {
-        val expected = List(file1.name, file2.name)
+        val expected = Vector(file1.name, file2.name)
         dir.contents.map(_.name) must contain theSameElementsAs expected
       }
 
       describe("when some entry already exist in the directory") {
         it("fails") {
-          Directory.addEntriesSafe(List(file1, file3))(dir).isFailure mustBe true
+          Directory.addEntriesSafe(Vector(file1, file3))(dir).isFailure mustBe true
         }
       }
     }
 
     describe("removeEntry()") {
-      val entries = List(file1, file2)
+      val entries = Vector(file1, file2)
       val dir = Directory.addEntries(entries)(Directory("dir01"))
 
       it("removes an entry from a directory") {
@@ -71,7 +71,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
     }
 
     describe("findByName()") {
-      val entries = List(file1, file2)
+      val entries = Vector(file1, file2)
       val dir = Directory.addEntries(entries)(Directory("dir01"))
 
       it("finds entry by name") {
@@ -91,11 +91,11 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
 
     describe("findEntryByPath()") {
       val dir0 = Directory("dir00")
-      val dir1 = Directory.addEntries(List(file1, file2))(Directory("dir01"))
-      val dir2 = Directory.addEntries(List(dir0, file3))(Directory("dir02"))
-      val dir3 = Directory.addEntries(List(dir1, dir2))(Directory("dir03"))
+      val dir1 = Directory.addEntries(Vector(file1, file2))(Directory("dir01"))
+      val dir2 = Directory.addEntries(Vector(dir0, file3))(Directory("dir02"))
+      val dir3 = Directory.addEntries(Vector(dir1, dir2))(Directory("dir03"))
 
-      val root = Directory.addEntries(List(dir3, file4, file5))(Directory.empty)
+      val root = Directory.addEntries(Vector(dir3, file4, file5))(Directory.empty)
 
       it("finds an entry by its path") {
         val foundFile = Directory.findEntryByPath(root, "dir03/dir02/my-file03")
