@@ -128,3 +128,6 @@ project/plugins/project/
 # End of https://www.gitignore.io/api/sbt,java,scala,intellij
 
 .metals
+.idea/misc.xml
+.idea/scala_compiler.xml
+.bsp/sbt.json
