@@ -3,11 +3,11 @@
   <component name="ScalaSbtSettings">
     <option name="linkedExternalProjectsSettings">
       <SbtProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/com.juliobetta.fakejs" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/com.juliobetta.fakefs" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$/com.juliobetta.fakejs" />
-            <option value="$PROJECT_DIR$/com.juliobetta.fakejs/project" />
+            <option value="$PROJECT_DIR$/com.juliobetta.fakefs" />
+            <option value="$PROJECT_DIR$/com.juliobetta.fakefs/project" />
           </set>
         </option>
         <option name="sbtVersion" value="1.4.0" />

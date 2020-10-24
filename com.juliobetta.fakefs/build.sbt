@@ -1,4 +1,4 @@
-name := "com.juliobetta.fakejs"
+name := "com.juliobetta.fakefs"
 
 version := "0.1"
 
