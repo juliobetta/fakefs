@@ -6,7 +6,7 @@ import org.scalatest.matchers.must.Matchers
 
 class FileSpec extends AnyFunSpec with Matchers with BeforeAndAfterEach{
   describe("File") {
-    val file = File("my-file", None, Some("initial"))
+    val file = File("my-file", Some("initial"))
 
     describe("addContents()") {
       it("replaces the current file contents") {
