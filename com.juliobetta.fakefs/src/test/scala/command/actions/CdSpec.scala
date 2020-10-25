@@ -1,18 +1,12 @@
 package command.actions
 
 import app.State
-import fs.Directory
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
 class CdSpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
-  val dir0: Directory = Directory("dir00")
-  val dir1: Directory = Directory("dir01")
-  val dir2: Directory = Directory.addEntries(Vector(dir0))(Directory("dir02"))
-  val dir3: Directory = Directory.addEntries(Vector(dir1, dir2))(Directory("dir03"))
-
-  val root: Directory = Directory.addEntries(Vector(dir3))(Directory.empty)
+  import fixtures.FileTree._
 
   val initialState: State = State(root, root)
 

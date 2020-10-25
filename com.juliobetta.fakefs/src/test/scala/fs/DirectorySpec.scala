@@ -5,11 +5,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
 class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
-  val file1: File = File("my-file01", Some("I have something 01"))
-  val file2: File = File("my-file02", Some("I have something 02"))
-  val file3: File = File("my-file03", Some("I have something 03"))
-  val file4: File = File("my-file04", Some("I have something 04"))
-  val file5: File = File("my-file05", Some("I have something 05"))
+  import fixtures.FileTree._
 
   describe("Directory") {
     describe("addEntry()") {
