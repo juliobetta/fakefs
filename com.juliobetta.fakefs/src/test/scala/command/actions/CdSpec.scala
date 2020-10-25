@@ -27,5 +27,15 @@ class CdSpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
         output.getOrElse("") must include regex "no such directory"
       }
     }
+
+    describe("when entry found is a file") {
+      it("returns the same error as directory not found") {
+        val path = "dir03/dir02/my-file03"
+        val (state, output) = Cd(Vector(path))(initialState)
+
+        state mustEqual initialState
+        output.getOrElse("") must include regex "no such directory"
+      }
+    }
   }
 }
