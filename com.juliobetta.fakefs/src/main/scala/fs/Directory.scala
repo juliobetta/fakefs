@@ -5,15 +5,15 @@ import scala.util.Try
 
 case class Directory(
   override val name: String,
-  override val parent: Option[Directory] = None,
-  contents: Vector[FileEntry] = Vector()
+  contents: Vector[FileEntry] = Vector(),
+  override val parent: Option[Directory] = None
 ) extends FileEntry(name, parent)
 
 object Directory {
   val ROOT_PATH: String = "/"
   val SEPARATOR: String = "/"
 
-  val empty: Directory = Directory("", None)
+  val empty: Directory = Directory("")
 
   val someEntriesExist: (Vector[FileEntry], Directory) => Boolean = (entries, dir) => {
     entries.map(entry => findByName(entry.name, dir.contents)).exists { _.isDefined }
