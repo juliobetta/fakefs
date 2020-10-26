@@ -1,6 +1,7 @@
 package command.actions
 
 import app.State
+import fs.Directory
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
@@ -8,7 +9,7 @@ import org.scalatest.matchers.must.Matchers
 class CdSpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
   import fixtures.FileTree._
 
-  val initialState: State = State(root, root)
+  val initialState: State = State(Directory.ROOT_PATH, root)
 
   describe("Cd") {
     it("finds directory by path and update state") {

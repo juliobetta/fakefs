@@ -8,8 +8,8 @@ case class Cd(tokens: Vector[String]) extends Command {
   val path: String = tokens.head
 
   override def apply(state: State): (State, Option[String]) = {
-    Directory.findEntryByPath(state.source, path) match {
-      case Some(dir: Directory) => (state.copy(currentDirectory = dir), None)
+    Directory.findEntryByPath(state.root, path) match {
+      case Some(_:Directory) => (state.copy(currentPath = path), None)
       case _ => (state, Some(s"cd: no such directory: $path"))
     }
   }
