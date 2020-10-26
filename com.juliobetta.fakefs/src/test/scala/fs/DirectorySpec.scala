@@ -52,7 +52,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
       val dir = Directory.addEntries(entries)(Directory("dir01"))
 
       it("removes an entry from a directory") {
-        val updatedDir = Directory.removeEntry(dir, file1.name)
+        val updatedDir = Directory.removeEntry(file1.name, dir)
         val entryNames = updatedDir.contents.map(_.name)
 
         entryNames must not contain file1.name
@@ -61,7 +61,7 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
 
       describe("when entry is not found") {
         it("it fails") {
-          Directory.removeEntrySafe(dir, "unknown").isFailure mustBe true
+          Directory.removeEntrySafe("unknown", dir).isFailure mustBe true
         }
       }
     }
