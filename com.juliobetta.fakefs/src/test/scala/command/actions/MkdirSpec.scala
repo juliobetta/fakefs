@@ -15,7 +15,7 @@ class MkdirSpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
     it("creates a new directory and updates state") {
       val dirName = "newDir"
       val (state, _) = Mkdir(Vector(dirName))(initialState)
-      val found = Directory.findEntryByPath(state.root, state.currentPath).collect { case dir: Directory => dir }
+      val found = Directory.findEntryByPath(state.currentPath, state.root).collect { case dir: Directory => dir }
 
       found.get.contents.map(_.name) must contain (dirName)
       state.currentDirectory.contents.map(_.name) must contain (dirName)

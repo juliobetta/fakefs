@@ -23,7 +23,7 @@ object Directory {
     entries.map(entry => findByName(entry.name, dir.contents)).exists { _.isDefined }
   }
 
-  val addEntry: FileEntry => Directory => Directory = entry => dir => {
+  val addEntry: (FileEntry, Directory) => Directory = (entry, dir) => {
     if (someEntriesExist(Vector(entry), dir)) throw new RuntimeException(s"${entry.name} already exists")
 
     val updatedContents = dir.contents :+ entry
@@ -38,18 +38,18 @@ object Directory {
     })
   }
 
-  val addEntrySafe: FileEntry => Directory => Try[Directory] = entry => dir => Try(addEntry(entry)(dir))
+  val addEntrySafe: (FileEntry, Directory) => Try[Directory] = (entry, dir) => Try(addEntry(entry, dir))
 
   @tailrec
-  val addEntries: Vector[FileEntry] => Directory => Directory = entries => dir => {
+  val addEntries: (Vector[FileEntry], Directory) => Directory = (entries, dir) => {
     entries match {
-      case head +: Vector() => addEntry(head)(dir)
-      case head +: tail => addEntry(head)(addEntries(tail)(dir))
+      case head +: Vector() => addEntry(head, dir)
+      case head +: tail => addEntry(head, addEntries(tail, dir))
       case _ => dir
     }
   }
 
-  val addEntriesSafe: Vector[FileEntry] => Directory => Try[Directory] = entries => dir => Try(addEntries(entries)(dir))
+  val addEntriesSafe: (Vector[FileEntry], Directory) => Try[Directory] = (entries, dir) => Try(addEntries(entries, dir))
 
   val removeEntry: (String, Directory) => Directory = (entryName, dir) => {
     if (findByName(entryName, dir.contents).isEmpty) throw new RuntimeException(s"$entryName does not exist")
@@ -68,7 +68,7 @@ object Directory {
     }
   }
 
-  val findEntryByPath: (Directory, String) => Option[FileEntry] = (root, path) => {
+  val findEntryByPath: (String, Directory) => Option[FileEntry] = (path, rootDir) => {
     /**
      * Helper is necessary to give `findEntry` a context to call itself recursively. otherwise, it throws the following:
      * "scala forward reference extends over definition of value"
@@ -93,7 +93,7 @@ object Directory {
       }
     }
 
-    Helper.findEntry(splitPath(path), root)
+    Helper.findEntry(splitPath(path), rootDir)
   }
 
   val resetContents: Directory => Directory = dir => dir.copy(contents = Vector())
@@ -104,7 +104,7 @@ object Directory {
   val updateContents: (String, Vector[FileEntry], Directory) => Directory = (path, updatedContents, source) => {
     object Helper {
       val updateSource: Vector[FileEntry] => Directory = sourceContents => {
-        (Directory.resetContents andThen Directory.addEntries(sourceContents))(source)
+        (Directory.resetContents andThen Directory.addEntries.curried(sourceContents))(source)
       }
 
       @tailrec
@@ -121,7 +121,7 @@ object Directory {
               // replace old contents by removing and add the new entry
               val updatedDir =
                 (Directory.removeEntry.curried(currentDir.name)
-                  andThen Directory.addEntry(currentDir.copy(contents = contents)))(dir)
+                  andThen Directory.addEntry.curried(currentDir.copy(contents = contents)))(dir)
 
               // update parents contents by reinitializing the process removing
               traverse(splitPath(path).dropRight(counterAcc), source, updatedDir.contents, counterAcc + 1)
