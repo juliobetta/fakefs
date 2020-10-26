@@ -19,7 +19,7 @@ object Directory {
     entries.map(entry => findByName(entry.name, dir.contents)).exists { _.isDefined }
   }
 
-  val addEntry: FileEntry => Directory => Directory = entry => dir => {
+  val addEntry: (FileEntry, Directory) => Directory = (entry, dir) => {
     if (someEntriesExist(Vector(entry), dir)) throw new RuntimeException(s"${entry.name} already exists")
 
     val updatedContents = dir.contents :+ entry
@@ -34,25 +34,25 @@ object Directory {
     })
   }
 
-  val addEntrySafe: FileEntry => Directory => Try[Directory] = entry => dir => Try(addEntry(entry)(dir))
+  val addEntrySafe: (FileEntry, Directory) => Try[Directory] = (entry, dir) => Try(addEntry(entry, dir))
 
   @tailrec
-  val addEntries: Vector[FileEntry] => Directory => Directory = entries => dir => {
+  val addEntries: (Vector[FileEntry], Directory) => Directory = (entries, dir) => {
     entries match {
-      case head +: Vector() => addEntry(head)(dir)
-      case head +: tail => addEntry(head)(addEntries(tail)(dir))
+      case head +: Vector() => addEntry(head, dir)
+      case head +: tail => addEntry(head, addEntries(tail, dir))
       case _ => dir
     }
   }
 
-  val addEntriesSafe: Vector[FileEntry] => Directory => Try[Directory] = entries => dir => Try(addEntries(entries)(dir))
+  val addEntriesSafe: (Vector[FileEntry], Directory) => Try[Directory] = (entries, dir) => Try(addEntries(entries, dir))
 
-  val removeEntry: (Directory, String) => Directory = (dir, entryName) => {
+  val removeEntry: (String, Directory) => Directory = (entryName, dir) => {
     if (findByName(entryName, dir.contents).isEmpty) throw new RuntimeException(s"$entryName does not exist")
     dir.copy(contents = dir.contents.filterNot(entry => entry.name == entryName))
   }
 
-  val removeEntrySafe: (Directory, String) => Try[Directory] = (dir, entryName) => Try(removeEntry(dir, entryName))
+  val removeEntrySafe: (String, Directory) => Try[Directory] = (entryName, dir) => Try(removeEntry(entryName, dir))
 
   @tailrec
   val findByName: (String, Vector[FileEntry]) => Option[FileEntry] = (name, contents) => {
@@ -64,7 +64,7 @@ object Directory {
     }
   }
 
-  val findEntryByPath: (Directory, String) => Option[FileEntry] = (root, path) => {
+  val findEntryByPath: (String, Directory) => Option[FileEntry] = (path, rootDir) => {
     val splitPath: Vector[String] = path.split(SEPARATOR).toVector.filter(_.nonEmpty)
 
     /**
@@ -91,6 +91,6 @@ object Directory {
       }
     }
 
-    Helper.findEntry(splitPath, root)
+    Helper.findEntry(splitPath, rootDir)
   }
 }
