@@ -119,17 +119,17 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
 
       describe("when double and single dots is present in the path") {
         it("switches to the parent directory") {
-          val foundFile = Directory.findEntryByPath("dir03/../my-file04", root)
+          val foundFile = Directory.findEntryByPath("dir03/../dir03/dir02/./dir00/../my-file03", root)
 
-          foundFile.map(_.name).head mustEqual file4.name
+          foundFile.map(_.name).head mustEqual file3.name
         }
       }
 
       describe("when entry is not found") {
         it("returns empty") {
-          val foundFile = Directory.findEntryByPath("dir03/../dir03/dir02/./dir00/../my-file03", root)
+          val foundFile = Directory.findEntryByPath("dir03/../dir03/dir00", root)
 
-          foundFile.map(_.name).head mustEqual file3.name
+          foundFile mustBe None
         }
       }
 
@@ -147,6 +147,24 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
 
           entry mustBe None
         }
+      }
+    }
+
+    describe("resetContents()") {
+      it("replaces contents by an empty Vector") {
+        Directory.resetContents(root).contents mustEqual Vector()
+      }
+    }
+
+    describe("updateContents()") {
+      it("updates contents deeply nested in the tree") {
+        val path = "dir03/../dir03/dir02/./dir00"
+        val newDir = Directory("newDir")
+        val updatedContents = Directory.addEntry(newDir, dir0).contents
+        val updatedRoot = Directory.updateContents(path, updatedContents, root)
+        val found = Directory.findEntryByPath(path, updatedRoot).collect { case dir: Directory => dir }
+
+        found.get.contents.map(_.name) must contain (newDir.name)
       }
     }
   }
