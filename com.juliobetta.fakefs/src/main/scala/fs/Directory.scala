@@ -17,7 +17,9 @@ object Directory {
 
   val empty: Directory = Directory("")
 
-  val splitPath: String => Vector[String] = path => path.split(SEPARATOR).toVector.filter(_.nonEmpty)
+  val splitPath: String => Vector[String] = path => path.split(SEPARATOR).toVector.filter(token =>
+    token.nonEmpty && token != CURRENT_DIR
+  )
 
   val someEntriesExist: (Vector[FileEntry], Directory) => Boolean = (entries, dir) => {
     entries.map(entry => findByName(entry.name, dir.contents)).exists { _.isDefined }
@@ -79,7 +81,6 @@ object Directory {
       val findEntry: (Vector[String], Directory) => Option[FileEntry] = (inputTokens, dir) => {
         inputTokens match {
           case Vector() => Some(dir)
-          case head +: tail if head == CURRENT_DIR => findEntry(tail, dir)
           case head +: tail if head == PARENT_DIR => dir.parent match {
             case Some(parentDir) => findEntry(tail, parentDir)
             case _ => None
@@ -111,7 +112,6 @@ object Directory {
       val traverse: (Vector[String], Directory, Vector[FileEntry], Int) => Directory = (tokens, dir, contents, counterAcc) => {
         tokens match {
           case Vector() => updateSource(contents)
-          case head +: tail if head == CURRENT_DIR => traverse(tail, dir, contents, counterAcc)
           case head +: tail if head == PARENT_DIR => dir.parent match {
             case Some(parentDir) => traverse(tail, parentDir, contents, counterAcc)
             case _ => updateSource(contents)
