@@ -22,14 +22,10 @@ class MkdirSpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
     }
 
     describe("when passing in -p") {
-      ignore("create a new directory in the given path") {
-
-      }
+      /*TODO*/ ignore("create a new directory in the given path") {}
 
       describe("when path is not found") {
-        ignore("returns an error message and keeps the same state") {
-
-        }
+        /*TODO*/ ignore("returns an error message and keeps the same state") {}
       }
     }
   }
