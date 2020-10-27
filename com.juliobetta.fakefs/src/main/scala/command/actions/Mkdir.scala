@@ -14,3 +14,7 @@ case class Mkdir(tokens: Vector[String]) extends Command {
     (state.copy(root = updatedRoot), None)
   }
 }
+
+object Mkdir {
+  override def toString: String = "mkdir"
+}

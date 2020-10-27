@@ -14,3 +14,7 @@ case class Cd(tokens: Vector[String]) extends Command {
     }
   }
 }
+
+object Cd {
+  override def toString: String = "cd"
+}
