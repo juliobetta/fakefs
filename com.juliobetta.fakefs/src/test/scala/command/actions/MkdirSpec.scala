@@ -21,6 +21,13 @@ class MkdirSpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
       state.currentDirectory.contents.map(_.name) must contain (dirName)
     }
 
+    describe("when dirName is not given") {
+      it("returns an output message") {
+        val (_, output) = Mkdir(Vector())(initialState)
+        output.isDefined mustBe true
+      }
+    }
+
     describe("when passing in -p") {
       /*TODO*/ ignore("create a new directory in the given path") {}
 
