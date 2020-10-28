@@ -76,3 +76,4 @@ project/plugins/project/
 
 .metals
 .idea
+.bsp

@@ -167,5 +167,15 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
         found.get.contents.map(_.name) must contain (newDir.name)
       }
     }
+
+    describe("getAbsolutePath()") {
+      it("gets directory absolute path") {
+        val dir02 = Directory.findEntryByPath("/dir03/dir02", root) match {
+          case Some(dir: Directory) => dir
+        }
+
+        Directory.getAbsolutePath(dir02) mustEqual "/dir03/dir02"
+      }
+    }
   }
 }
