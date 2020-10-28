@@ -135,4 +135,21 @@ object Directory {
     val initialCounter = 1
     Helper.traverse(splitPath(path), source, updatedContents, initialCounter)
   }
+
+  /**
+   * Get directory absolute path from
+   */
+  val getAbsolutePath: Directory => String = dir => {
+    object Helper {
+      @tailrec
+      val traverse: (Directory, Vector[String]) => Vector[String] = (dir, acc) => {
+        dir.parent match {
+          case Some(parent) => traverse(parent, acc :+ parent.name)
+          case _ => acc
+        }
+      }
+    }
+
+    SEPARATOR + Helper.traverse(dir, Vector(dir.name)).reverse.mkString(SEPARATOR)
+  }
 }
