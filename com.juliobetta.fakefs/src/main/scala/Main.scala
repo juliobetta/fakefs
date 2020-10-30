@@ -1,9 +1,8 @@
-package app
-
+import app.State
 import command.{Command, Input}
 import fs.Directory
 
-object Playground extends App {
+object Main extends App {
   val root = Directory.empty
 
   val initialState = State(Directory.ROOT_PATH, root)

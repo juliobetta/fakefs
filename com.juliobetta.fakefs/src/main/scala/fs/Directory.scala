@@ -66,7 +66,6 @@ object Directory {
       case Vector() => None
       case head +: _ if head.name == name => Some(head)
       case _ +: tail => findByName(name, tail)
-      case _ => None
     }
   }
 
