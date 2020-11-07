@@ -4,6 +4,8 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.must.Matchers
 
+import scala.annotation.tailrec
+
 class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
   import fixtures.FileTree._
 
@@ -170,12 +172,12 @@ class DirectorySpec extends AnyFunSpec with Matchers with BeforeAndAfterEach {
 
     describe("getAbsolutePath()") {
       it("gets directory absolute path") {
-        val dir02 = Directory.findEntryByPath("/dir03/dir02", root) match {
+        val dir = Directory.findEntryByPath("/dir03/dir02/dir00", root) match {
           case Some(dir: Directory) => dir
           case _ => Directory.empty
         }
 
-        Directory.getAbsolutePath(dir02) mustEqual "/dir03/dir02"
+        Directory.getAbsolutePath(dir) mustEqual "/dir03/dir02/dir00"
       }
     }
   }

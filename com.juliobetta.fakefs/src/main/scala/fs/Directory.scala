@@ -149,6 +149,6 @@ object Directory {
       }
     }
 
-    SEPARATOR + Helper.traverse(dir, Vector(dir.name)).reverse.mkString(SEPARATOR)
+    Helper.traverse(dir, Vector(dir.name)).reverse.mkString(SEPARATOR)
   }
 }
