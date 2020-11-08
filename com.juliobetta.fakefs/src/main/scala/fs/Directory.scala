@@ -30,6 +30,8 @@ object Directory {
 
     val updatedContents = dir.contents :+ entry
 
+    // update parent of each current dir contents
+    // TODO: improve this to deeply update nodes
     dir.copy(contents = updatedContents.map { entry =>
       val updatedDir = Some(dir.copy(contents = updatedContents))
 
