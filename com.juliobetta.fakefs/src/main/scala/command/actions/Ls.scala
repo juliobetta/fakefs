@@ -11,7 +11,7 @@ case class Ls(tokens: Vector[String]) extends Command {
   }
 
   override def apply(state: State): (State, Option[String]) = {
-    val printContents: Vector[FileEntry] => String = contents => contents.mkString("\n")
+    val printContents: Vector[FileEntry] => String = contents => contents.sortBy(_.name).mkString("\n")
 
     if (path.isEmpty) (state, Some(printContents(state.currentDirectory.contents)))
     else Directory.findEntryByPath(path, state.currentDirectory) match {

@@ -13,8 +13,9 @@ class LsSpec extends AnyFunSpec with Matchers {
 
     it("prints the list of entries from a directory") {
       val (_, output) = Ls(Vector())(initialState)
+      val expected = s"$dir3\n$file4\n$file5"
 
-      output.getOrElse("").split("\n") must contain theSameElementsAs Vector(dir3.name, file4.name, file5.name)
+      output.getOrElse("") must include (expected)
     }
 
     describe("when path is not found") {
