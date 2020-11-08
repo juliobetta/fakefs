@@ -10,6 +10,7 @@ case class Input(input: String) {
     case "cd" => Cd(tokens.tail)
     case "mkdir" => Mkdir(tokens.tail)
     case "ls" => Ls(tokens.tail)
+    case "exit" => Exit()
     case _ => Invalid
   }
 }
